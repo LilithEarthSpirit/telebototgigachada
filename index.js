@@ -84,9 +84,9 @@ bot.onText(/Тесты/, async (text) => {
 const goToNextTask = async (chatId, {levelName, offset, rightLength}) => {
   const task = await TaskController.getOneWithButtons(levelName, offset, rightLength)
   bot.sendMessage(chatId, `Вопрос #${offset + 1}. ${task.question}`, {
+    parse_mode: 'Markdown',
     reply_markup: {
       inline_keyboard: task.buttons,
-      parse_mode: 'Markdown',
     },
   })
   return task
