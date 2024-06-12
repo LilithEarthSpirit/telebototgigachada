@@ -85,7 +85,10 @@ bot.on('message', async (msg) => {
     selectedTopic = textClient
     const translates = await getRandom(selectedTopic)
     const output = translates.reduce((acc, translate) => {
-      acc += `*${translate.source}* - *${translate.target}*\n`
+      acc += `*${translate.source.replace(
+        /([\[\]\\])/g,
+        '\\$1'
+      )}* - *${translate.target.replace(/([\[\]\\])/g, '\\$1')}*\n`
       return acc
     }, '')
     await bot.sendMessage(
@@ -165,7 +168,9 @@ bot.on('message', async (msg) => {
     textClient === directions[0].label ||
     textClient === directions[1].label
   ) {
-    selectedDirection = textClient.toLowerCase()
+    selectedDirection = directions.find(
+      (direction) => direction.label === textClient
+    ).value
     bot.sendMessage(clientId, 'Выберите уровень', {
       reply_markup: {
         keyboard: [titles],
@@ -177,11 +182,7 @@ bot.on('message', async (msg) => {
       levelName: textClient,
       offset: 0,
       rightLength: 0,
-      type:
-        directions.find(
-          (direction) =>
-            direction.label.toLowerCase() === selectedDirection.toLowerCase()
-        )?.value || null,
+      type: selectedDirection,
     })
     selectedDirection = null
   }
@@ -192,15 +193,15 @@ bot.on('callback_query', async (query) => {
 
   const { size, offset, qa } = JSON.parse(query.data)
   let { rightLength } = JSON.parse(query.data)
-  const [userAnwer, rightAnswer, levelName] = qa.split('_')
-  const isRight = userAnwer === rightAnswer
+  const [userAnswer, rightAnswer, levelName, type] = qa.split('_')
+  const isRight = userAnswer === rightAnswer
   bot.editMessageReplyMarkup(
     {
       inline_keyboard: [
         [
           {
             text: isRight ? 'Верно ✅' : 'Неверно ❌',
-            callback_data: isRight ? 'aboba' : 'sad',
+            callback_data: 'noop',
           },
         ],
       ],
@@ -216,7 +217,7 @@ bot.on('callback_query', async (query) => {
   } else {
     await goToNextTask(chatId, {
       levelName,
-      type: '',
+      type,
       offset: offset + 1,
       rightLength: rightLength,
     })
