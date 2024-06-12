@@ -10,10 +10,11 @@ export const getAllByLevel = async (levelName, type) => {
     for (const taskId of level.tasks) {
       const rawRes = await fetch(`${environment.fbDbUrl}/tasks/${taskId}.json`)
       const task = await rawRes.json()
-      if (task.type === type) {
-        tasks.push(task)
-      }
+      console.log('task:', task)
+      tasks.push(task)
     }
+    // console.log(tasks.filter((task) => task.type === type))
+    // return tasks.filter((task) => task.type === type)
     return tasks
   } catch (err) {
     console.log(err)
@@ -22,6 +23,7 @@ export const getAllByLevel = async (levelName, type) => {
 
 const getOneByLevel = async (levelName, offset, type) => {
   const tasks = await getAllByLevel(levelName, type)
+  console.log(tasks)
   return { ...tasks[offset], size: tasks.length }
 }
 
@@ -32,7 +34,6 @@ export const getOneWithButtons = async (
   type
 ) => {
   const task = await getOneByLevel(levelName, offset, type)
-  console.log('task: ', task)
   const buttons = task.answers.reduce((acc, variant, idx) => {
     acc.push({
       text: variant,
