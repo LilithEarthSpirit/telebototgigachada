@@ -1,5 +1,5 @@
-import environment from "../environment/index.mjs"
-import { FbUtils } from "../utils/index.mjs"
+import environment from '../environment/index.mjs'
+import { FbUtils } from '../utils/index.mjs'
 
 export const getAll = async () => {
   try {
@@ -11,7 +11,7 @@ export const getAll = async () => {
   }
 }
 
-export const getTitles = async () => {
+export const getTitles = async (type) => {
   const levels = await getAll()
-  return levels.map(level => level.name)
+  return levels.map((level) => level.name)
 }
